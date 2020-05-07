@@ -163,7 +163,7 @@ struct World {
 	}
 };
 
-struct FlappyGRNXP {
+struct FlappyXP {
 	static const constexpr int viewDist = 1;
   template <typename G> static G randomInit(size_t nbReguls = 0, int f = 0, int i = 0, int n = 0) {
 		G g(f, i, n);
@@ -172,17 +172,17 @@ struct FlappyGRNXP {
 		// bestiau's height
 		// next obstacle's height
 		// next obstacle's dist
-		g.addRandomProtein(G::ProteinType_t::input, "h");
-		g.addRandomProtein(G::ProteinType_t::input, "0h");
-		g.addRandomProtein(G::ProteinType_t::input, "0d");
+					// g.addRandomProtein(G::ProteinType_t::input, "h");
+					// g.addRandomProtein(G::ProteinType_t::input, "0h");
+					// g.addRandomProtein(G::ProteinType_t::input, "0d");
 		if (viewDist > 1) {
-			g.addRandomProtein(G::ProteinType_t::input, "1h");
-			g.addRandomProtein(G::ProteinType_t::input, "1d");
+						// g.addRandomProtein(G::ProteinType_t::input, "1h");
+						// g.addRandomProtein(G::ProteinType_t::input, "1d");
 		}
 		// two outputs, changing ratio = press up
-		g.addRandomProtein(G::ProteinType_t::output, "0");
-		g.addRandomProtein(G::ProteinType_t::output, "1");
-		g.randomReguls(nbReguls);
+					// g.addRandomProtein(G::ProteinType_t::output, "0");
+					// g.addRandomProtein(G::ProteinType_t::output, "1");
+					// g.randomReguls(nbReguls);
 		return g;
 	}
 
@@ -194,7 +194,8 @@ struct FlappyGRNXP {
 		curs_set(FALSE);
 #endif
 		const int NRUN = 3;
-		auto &g = ind.dna;
+					// auto &g = ind.dna;
+		auto &g = ind;
 		double d = 0;
 		for (int r = 0; r < NRUN; ++r) {
 			World world;
@@ -206,28 +207,28 @@ struct FlappyGRNXP {
 #endif
 				world.update();
 				// update inputs
-				g.setInputConcentration("h", world.bestiau.y);
+							// g.setInputConcentration("h", world.bestiau.y);
 				if (world.obstacles.size() > 0) {
 					const auto &o = world.obstacles.front();
-					g.setInputConcentration("0h", o.y + world.hauteurPassage * 0.5);
-					g.setInputConcentration("0d", o.x / world.W);
+								// g.setInputConcentration("0h", o.y + world.hauteurPassage * 0.5);
+								// g.setInputConcentration("0d", o.x / world.W);
 					if (viewDist > 1) {
 						if (world.obstacles.size() > 1) {
 							const auto &o2 = world.obstacles[1];
-							g.setInputConcentration("1h", o2.y + world.hauteurPassage * 0.5);
-							g.setInputConcentration("1d", o2.x / world.W);
+										// g.setInputConcentration("1h", o2.y + world.hauteurPassage * 0.5);
+										// g.setInputConcentration("1d", o2.x / world.W);
 						} else {
-							g.setInputConcentration("1h", 0);
-							g.setInputConcentration("1d", 1);
+										// g.setInputConcentration("1h", 0);
+										// g.setInputConcentration("1d", 1);
 						}
 					}
 				} else {
-					g.setInputConcentration("0h", 0);
-					g.setInputConcentration("0d", 1);
+								// g.setInputConcentration("0h", 0);
+								// g.setInputConcentration("0d", 1);
 				}
-				bool pbehind = g.getOutputConcentration("0") <= g.getOutputConcentration("1");
-				g.step();
-				bool behind = g.getOutputConcentration("0") <= g.getOutputConcentration("1");
+							// bool pbehind = g.getOutputConcentration("0") <= g.getOutputConcentration("1");
+							// g.step();
+							// bool behind = g.getOutputConcentration("0") <= g.getOutputConcentration("1");
 				if (!behind && pbehind) world.bestiauUp();
 			}
 			d += world.dist;
