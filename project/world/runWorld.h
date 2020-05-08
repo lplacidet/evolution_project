@@ -10,76 +10,13 @@
 #ifdef DISPLAY
 //#include <curses.h>
 
-template <typename W> void display(const W &w, bool needClear = false) {
-	start_color();
-	init_color(COLOR_GREEN, 200, 800, 0);
-	init_color(COLOR_RED, 900, 200, 0);
-	init_color(COLOR_BLUE, 0, 450, 800);
-	double squareV = pow(1.0 + 10.0 * w.bestiau.vit, 2);
-	init_color(COLOR_YELLOW, 600 + 100 * squareV, 600 - 100 * squareV,
-	           100 + (squareV * 0.2));
-	init_pair(1, COLOR_WHITE, COLOR_BLUE);
-	init_pair(2, COLOR_GREEN, COLOR_GREEN);
-	init_pair(3, COLOR_RED, COLOR_RED);
-	init_pair(4, COLOR_YELLOW, COLOR_YELLOW);
-	bkgd(COLOR_PAIR(1));
-
-	int row;
-	int col;
-	getmaxyx(stdscr, row, col);
-	double whRatio = w.W / w.H;
-	double crRatio = (double)col / (double)row;
-	double coef = crRatio < whRatio ? (double)col / w.W : (double)row / w.H;
-
-	if (needClear) {
-		clear();
-	}
-
-	// bordures
-	std::string bordures(w.W * coef, ' ');
-	attron(COLOR_PAIR(2));
-	for (size_t i = 0; i < w.epaisseurBordures * coef - 1; ++i) {
-		mvprintw(i, 0, bordures.c_str());
-	}
-	for (size_t i = 0; i < w.epaisseurBordures * coef; ++i) {
-		mvprintw(w.H * coef - w.epaisseurBordures * coef + i, 0, bordures.c_str());
-	}
-	attroff(COLOR_PAIR(2));
-	std::string clearObstacles(w.largeurObstacles * coef + 10, ' ');
-	attron(COLOR_PAIR(1));
-	for (size_t r = w.epaisseurBordures * coef; r < (w.H - w.epaisseurBordures) * coef - 2;
-	     ++r) {
-		mvprintw(r, 0, clearObstacles.c_str());
-	}
-	std::string strObstacles(w.largeurObstacles * coef, ' ');
-	for (auto &o : w.obstacles) {
-		if (o.x < w.W - w.largeurObstacles) {
-			for (size_t r = w.epaisseurBordures * coef;
-			     r < (w.H - w.epaisseurBordures) * coef - 2; ++r) {
-				attron(COLOR_PAIR(1));
-				mvprintw(r, o.x * coef, clearObstacles.c_str());
-				attron(COLOR_PAIR(3));
-				if (r < coef * (w.H - (o.y + w.hauteurPassage)) || r > coef * (w.H - o.y))
-					mvprintw(r, o.x * coef, strObstacles.c_str());
-			}
-		}
-	}
-	attroff(COLOR_PAIR(3));
-	// bestiau
-	double deltaVit = 0.05;
-	attron(COLOR_PAIR(4));
-	mvprintw(coef * (w.H - w.bestiau.y), coef * w.bestiau.x, "  ");
-	attron(COLOR_PAIR(1));
-	mvprintw(0.1 * coef, 2.6 * coef, "%f", w.dist);
-	attroff(COLOR_PAIR(1));
-	refresh();
-}
+template <typename W> void display(const W &w, bool needClear = false);
 #endif
 
-//typedef std::chrono::duration<int, std::milli> ms;
+typedef std::chrono::duration<int, std::milli> ms;
 
-//enum Color { green, red, blue };
-/*
+enum Color { green, red, blue };
+
 struct World {
 	struct Obstacle {
 		Obstacle(double Y) : y(Y) {}
@@ -163,6 +100,7 @@ struct World {
 	}
 };
 
+
 struct FlappyXP {
 	static const constexpr int viewDist = 1;
  	// template <typename G> static G randomInit(size_t nbReguls = 0, int f = 0, int i = 0, int n = 0) {
@@ -208,13 +146,15 @@ struct FlappyXP {
 				// update inputs
 				float birdY = world.bestiau.y;
 				float birdVY = world.bestiau.vit;
+                float obsX;
+                float obsY;
 				if (world.obstacles.size() > 0) {
 					const auto &o = world.obstacles.front();
-					float obsY = o.y + world.hauteurPassage * 0.5;
-					float obsX = o.x / world.W;
+					obsY = o.y + world.hauteurPassage * 0.5;
+					obsX = o.x / world.W;
 				} else {
-					float obsY = world.H * 0.5;
-					float obsX = 1000.0;
+					obsY = world.H * 0.5;
+					obsX = 1000.0;
 				}
 				if (g.doFlap(birdY, birdVY, obsX, obsY)) world.bestiauUp();
 			}
@@ -227,5 +167,53 @@ struct FlappyXP {
 	}
 };
 
+#endif
+
+float test(float f){
+    return f+1;
+}
+
+/*
+template <typename I> static double evaluate_bird(I &ind, bool dbg = false) {
+#ifdef DISPLAY
+	initscr();
+	timeout(0);
+	noecho();
+	curs_set(FALSE);
+#endif
+	const int NRUN = 3;
+	auto &g = ind;
+	double d = 0;
+	for (int r = 0; r < NRUN; ++r) {
+		World world;
+		world.gen.seed(r * 100);
+		while (world.bestiau.vivant) {
+#ifdef DISPLAY
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            display(world, world.dist == 0);
+#endif
+            world.update();
+            // update inputs
+            float birdY = world.bestiau.y;
+            float birdVY = world.bestiau.vit;
+            float obsX;
+            float obsY;
+            if (world.obstacles.size() > 0) {
+                const auto &o = world.obstacles.front();
+                obsY = o.y + world.hauteurPassage * 0.5;
+                obsX = o.x / world.W;
+            } else {
+                obsY = world.H * 0.5;
+                obsX = 1000.0;
+            }
+            if (g.doFlap(birdY, birdVY, obsX, obsY)) world.bestiauUp();
+        }
+        d += world.dist;
+    }
+#ifdef DISPLAY
+    endwin();
+#endif
+    return d;
+}
 #endif
 */
