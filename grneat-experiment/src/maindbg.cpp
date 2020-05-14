@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 		float g4 = (float) argv[5];
 		float g5 = (float) argv[6];
 
-		XP::evaluate(g1,g2,g3,g4,g5, true);
+		XP::evaluate_genes(g1,g2,g3,g4,g5, true);
 		std::cerr << "Fitnesses : " << std::endl;
 		for (auto& f : ind.fitnesses) {
 			std::cerr << " - " << f.first << " : " << f.second << std::endl;

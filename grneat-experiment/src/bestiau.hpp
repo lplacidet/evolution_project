@@ -186,7 +186,61 @@ struct FlappyGRNXP {
 		return g;
 	}
 
-	template <typename I> static void evaluate(float g1, float g2, float g3, float g4, float g5, bool dbg = false) {
+	template <typename I> static void evaluate(I &ind, bool dbg = false) {
+#ifdef DISPLAY
+		initscr();
+		timeout(0);
+		noecho();
+		curs_set(FALSE);
+#endif
+		const int NRUN = 3;
+		auto &g = ind.dna;
+		double d = 0;
+		for (int r = 0; r < NRUN; ++r) {
+			World world;
+			world.gen.seed(r * 100);
+			while (world.bestiau.vivant) {
+#ifdef DISPLAY
+				std::this_thread::sleep_for(std::chrono::milliseconds(25));
+				display(world, world.dist == 0);
+	            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+	            display(world, world.dist == 0);
+#endif
+				world.update();
+				// update inputs
+				g.setInputConcentration("h", world.bestiau.y);
+				if (world.obstacles.size() > 0) {
+					const auto &o = world.obstacles.front();
+					g.setInputConcentration("0h", o.y + world.hauteurPassage * 0.5);
+					g.setInputConcentration("0d", o.x / world.W);
+					if (viewDist > 1) {
+						if (world.obstacles.size() > 1) {
+							const auto &o2 = world.obstacles[1];
+							g.setInputConcentration("1h", o2.y + world.hauteurPassage * 0.5);
+							g.setInputConcentration("1d", o2.x / world.W);
+						} else {
+							g.setInputConcentration("1h", 0);
+							g.setInputConcentration("1d", 1);
+						}
+					}
+				} else {
+					g.setInputConcentration("0h", 0);
+					g.setInputConcentration("0d", 1);
+				}
+				bool pbehind = g.getOutputConcentration("0") <= g.getOutputConcentration("1");
+				g.step();
+				bool behind = g.getOutputConcentration("0") <= g.getOutputConcentration("1");
+				if (!behind && pbehind) world.bestiauUp();
+			}
+			d += world.dist;
+		}
+		ind.fitnesses["distance"] = d / static_cast<double>(NRUN);
+#ifdef DISPLAY
+		endwin();
+#endif
+	}
+
+	template <typename I> static void evaluate_genes(float g1, float g2, float g3, float g4, float g5, bool dbg = false) {
 		float ind[5] = {g1,g2,g3,g4,g5};
 		bool dbg = false;
 #ifdef DISPLAY
