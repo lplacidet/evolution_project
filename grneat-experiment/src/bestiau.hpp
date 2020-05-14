@@ -187,6 +187,7 @@ struct FlappyGRNXP {
 	}
 
 	template <typename I> static void evaluate(I &ind, bool dbg = false) {
+		if(dbg) printf("%d",1);
 #ifdef DISPLAY
 		initscr();
 		timeout(0);
@@ -240,9 +241,9 @@ struct FlappyGRNXP {
 #endif
 	}
 
-	template <typename I> static void evaluate_genes(float g1, float g2, float g3, float g4, float g5, bool dbg = false) {
+	static float evaluate_genes(float& g1, float& g2, float& g3, float& g4, float& g5, bool dbg = false) {
 		float ind[5] = {g1,g2,g3,g4,g5};
-		bool dbg = false;
+		if(dbg) printf("%d",1);
 #ifdef DISPLAY
 		initscr();
 		timeout(0);
@@ -274,12 +275,13 @@ struct FlappyGRNXP {
 	                obsY = world.H * 0.5;
 	                obsX = 1000.0;
 	            }
-	            if ((g[0]*birdY+g[1]*birdVY+g[2]*obsX+g[3]*obsY+g[4]*world.dist)>1.0) world.bestiauUp();
+	            if ((g[0]*(birdY-obsY)+g[1]*birdY+g[2]*obsX+g[3]*birdVY+g[4]*world.vitesseDefilement)>1.0) world.bestiauUp();
 	        }
 	        d += world.dist;
 	        float distToTunnel = world.bestiau.y-(world.obstacles.front().y+world.hauteurPassage*0.5);
 	        d += 0.3*(1-((distToTunnel*distToTunnel)/(world.H*world.H)));
 	    }
+	    return d;
 #ifdef DISPLAY
 		endwin();
 #endif

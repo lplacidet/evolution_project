@@ -27,11 +27,11 @@ int main(int argc, char** argv) {
 		GRN_t g(buffer.str(), 0, 1, 0);
 		GAGA::Individual<GRN_t> ind(g);
 
-		float g1 = (float) argv[2];
-		float g2 = (float) argv[3];
-		float g3 = (float) argv[4];
-		float g4 = (float) argv[5];
-		float g5 = (float) argv[6];
+		float g1 = stof(argv[2]);
+		float g2 = stof(argv[3]);
+		float g3 = stof(argv[4]);
+		float g4 = stof(argv[5]);
+		float g5 = stof(argv[6]);
 
 		XP::evaluate_genes(g1,g2,g3,g4,g5, true);
 		std::cerr << "Fitnesses : " << std::endl;
