@@ -14,11 +14,11 @@
 int main(int argc, char** argv) {
 	using GRN_t = GRN<RealC>;
 
-  // using XP = DoubleFreqXP;
-  // using XP = LowPassXP;
-  using XP = FlappyGRNXP;
-  // using XP = CoverageXP;
-  // using XP = ShipEscape::shipXP;
+	// using XP = DoubleFreqXP;
+	// using XP = LowPassXP;
+	using XP = FlappyGRNXP;
+	// using XP = CoverageXP;
+	// using XP = ShipEscape::shipXP;
 
 	if (argc > 1) {
 		std::ifstream t(argv[1]);
@@ -26,7 +26,14 @@ int main(int argc, char** argv) {
 		buffer << t.rdbuf();
 		GRN_t g(buffer.str(), 0, 1, 0);
 		GAGA::Individual<GRN_t> ind(g);
-		XP::evaluate(ind, true);
+
+		float g1 = (float) argv[2];
+		float g2 = (float) argv[3];
+		float g3 = (float) argv[4];
+		float g4 = (float) argv[5];
+		float g5 = (float) argv[6];
+
+		XP::evaluate(g1,g2,g3,g4,g5, true);
 		std::cerr << "Fitnesses : " << std::endl;
 		for (auto& f : ind.fitnesses) {
 			std::cerr << " - " << f.first << " : " << f.second << std::endl;
